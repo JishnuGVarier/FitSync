@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - FitSync</title>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="auth.css" />
+
+    <style>
+      .error {
+        color: red;
+        display: none;
+      }
+      .form-group {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand"><a href="index.html">FitSync</a></div>
+      <div class="nav-right">
+        <div class="theme-toggle" id="themeToggle">☀️</div>
+        <div class="nav-links">
+          <a href="login.html">Login</a>
+          <a href="signup.html" class="signup-btn">Sign Up</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="auth-container">
+      <h2>Create FitSync Account</h2>
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            minlength="3"
+          />
+          <div id="usernameError" class="error">
+            Username must be at least 3 characters
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+          <div id="emailError" class="error">Please enter a valid email</div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            minlength="6"
+          />
+          <div id="passwordError" class="error">
+            Password must be at least 6 characters
+          </div>
+        </div>
+        <div id="formError" class="error"></div>
+        <button type="submit">Sign Up</button>
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </form>
+    </div>
+    <script>
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          // Reset errors
+          document
+            .querySelectorAll(".error")
+            .forEach((el) => (el.style.display = "none"));
+
+          // Validate
+          let hasError = false;
+          if (!username || username.length < 3) {
+            document.getElementById("usernameError").style.display = "block";
+            hasError = true;
+          }
+          if (!email || !email.match(/^\S+@\S+\.\S+$/)) {
+            document.getElementById("emailError").style.display = "block";
+            hasError = true;
+          }
+          if (!password || password.length < 6) {
+            document.getElementById("passwordError").style.display = "block";
+            hasError = true;
+          }
+          if (hasError) return;
+
+          try {
+            const response = await fetch("http://localhost:8080/api/signup", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, email, password }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.error);
+            }
+
+            // Store token and redirect
+            localStorage.setItem("token", data.token);
+            window.location.href = "/dashboard.html";
+          } catch (error) {
+            document.getElementById("formError").textContent = error.message;
+            document.getElementById("formError").style.display = "block";
+          }
+        });
+
+      const themeToggle = document.getElementById("themeToggle");
+      const root = document.documentElement;
+
+      // Check for saved preference
+      const currentTheme = localStorage.getItem("theme") || "light";
+      root.setAttribute("data-theme", currentTheme);
+      themeToggle.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+
+      themeToggle.addEventListener("click", () => {
+        const newTheme =
+          root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        themeToggle.textContent = newTheme === "dark" ? "🌙" : "☀️";
+      });
+    </script>
+  </body>
+</html>

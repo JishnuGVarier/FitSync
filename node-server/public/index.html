@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitSync - Real-time Health Monitoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand">FitSync</div>
+      <div class="nav-right">
+        <div class="theme-toggle" id="themeToggle">☀️</div>
+        <div class="nav-links">
+          <a href="login.html">Login</a>
+          <a href="signup.html" class="signup-btn">Sign Up</a>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <h1>Welcome to FitSync</h1>
+      <p>Advanced real-time health monitoring powered by AI</p>
+    </section>
+
+    <section class="features">
+      <div class="feature-card">
+        <h2>Real-time Monitoring</h2>
+        <p>
+          Track your heart rate and health patterns in real-time with advanced
+          sensors and AI technology.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h2>Anomaly Detection</h2>
+        <p>
+          Our AI system continuously monitors your health data to detect
+          potential anomalies and irregularities.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h2>Predictive Analytics</h2>
+        <p>
+          Advanced machine learning algorithms predict patterns and provide
+          early warning signs.
+        </p>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Connect</h3>
+          <p>Link your health monitoring device to our system</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Monitor</h3>
+          <p>View real-time health data on your dashboard</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Analyze</h3>
+          <p>Get AI-powered insights about your health patterns</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2024 FitSync. All rights reserved.</p>
+    </footer>
+
+    <script>
+      const themeToggle = document.getElementById("themeToggle");
+      const root = document.documentElement;
+
+      // Check for saved preference
+      const currentTheme = localStorage.getItem("theme") || "light";
+      root.setAttribute("data-theme", currentTheme);
+      themeToggle.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+    </script>
+  </body>
+</html>

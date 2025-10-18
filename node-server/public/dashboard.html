@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-time Anomaly Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+    <style>
+      .nav-button {
+        padding: 8px 16px;
+        background-color: var(--button-bg);
+        border: 1px solid var(--button-border);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        color: var(--text-color);
+      }
+
+      .nav-button:hover {
+        background-color: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand"><a href="index.html">FitSync</a></div>
+      <div class="nav-right">
+        <div class="nav-links">
+          <button
+            class="nav-button"
+            onclick="window.location.href='sessions.html'"
+          >
+            Past Sessions
+          </button>
+          <button class="signout-button">Sign Out</button>
+        </div>
+        <div class="theme-toggle" id="themeToggle">☀️</div>
+      </div>
+    </nav>
+
+    <h2>Real-time Anomaly Detection</h2>
+
+    <div class="chart-row">
+      <div class="chart-container">
+        <p>Anomaly Score Over Time</p>
+        <p class="chart-description">
+          This chart visualizes real-time anomaly detection results where a
+          value of 0 indicates normal heart rate patterns and 1 signals
+          potential anomalies that might require attention. The system
+          continuously monitors for irregularities in the heart rate data.
+        </p>
+        <canvas id="anomalyChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <p>Input Heart Rate</p>
+        <p class="chart-description">
+          Real-time heart rate measurements collected directly from the sensor
+          device. This data stream shows the actual beats per minute (BPM)
+          readings as they occur, providing immediate feedback about the current
+          heart rate activity.
+        </p>
+        <canvas id="inputChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-container">
+        <p>Predicted Heart Rate</p>
+        <p class="chart-description">
+          Using advanced machine learning algorithms, this chart displays the AI
+          model's predictions of expected heart rate values. These predictions
+          are based on historical patterns and help identify potential
+          deviations from normal heart rate behavior.
+        </p>
+        <canvas id="predictedChart"></canvas>
+      </div>
+    </div>
+
+    <script>
+      const themeToggle = document.getElementById("themeToggle");
+      const root = document.documentElement;
+
+      // Check for saved preference
+      const currentTheme = localStorage.getItem("theme") || "light";
+      root.setAttribute("data-theme", currentTheme);
+      themeToggle.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+
+      themeToggle.addEventListener("click", () => {
+        const newTheme =
+          root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        themeToggle.textContent = newTheme === "dark" ? "🌙" : "☀️";
+
+        // Update chart themes
+        [anomalyChart, inputChart, predictedChart].forEach((chart) => {
+          chart.options.scales.x.grid.color =
+            newTheme === "dark" ? "#404040" : "#ddd";
+          chart.options.scales.y.grid.color =
+            newTheme === "dark" ? "#404040" : "#ddd";
+          chart.options.scales.x.ticks.color =
+            newTheme === "dark" ? "#fff" : "#666";
+          chart.options.scales.y.ticks.color =
+            newTheme === "dark" ? "#fff" : "#666";
+          chart.update();
+        });
+      });
+
+      // Sign out functionality
+      document
+        .querySelector(".signout-button")
+        .addEventListener("click", () => {
+          localStorage.removeItem("token");
+          alert("You have been signed out.");
+          window.location.href = "index.html";
+        });
+
+      const ctx = document.getElementById("anomalyChart").getContext("2d");
+      const anomalyChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [], // Time labels
+          datasets: [
+            {
+              label: "Anomaly Score",
+              data: [],
+              borderColor: "red",
+              backgroundColor: "rgba(255, 0, 0, 0.2)",
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            x: {
+              title: { display: true, text: "Time (s)" },
+              ticks: { maxTicksLimit: 20 },
+            },
+            y: {
+              title: { display: true, text: "Anomaly (0 or 1)" },
+              min: 0,
+              max: 1,
+              ticks: { stepSize: 1 },
+            },
+          },
+        },
+      });
+
+      const inputCtx = document.getElementById("inputChart").getContext("2d");
+      const inputChart = new Chart(inputCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Input HR",
+              data: [],
+              borderColor: "blue",
+              backgroundColor: "rgba(0, 0, 255, 0.2)",
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            x: {
+              title: { display: true, text: "Time (s)" },
+              ticks: { minTicksLimit: 20 },
+            },
+            y: { title: { display: true, text: "Heart Rate (BPM)" } },
+          },
+        },
+      });
+
+      const predictedCtx = document
+        .getElementById("predictedChart")
+        .getContext("2d");
+      const predictedChart = new Chart(predictedCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Predicted HR",
+              data: [],
+              borderColor: "green",
+              backgroundColor: "rgba(0, 255, 0, 0.2)",
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            x: {
+              title: { display: true, text: "Time (s)" },
+              ticks: { maxTicksLimit: 20 },
+            },
+            y: { title: { display: true, text: "Heart Rate (BPM)" } },
+          },
+        },
+      });
+
+      const ws = new WebSocket("ws://localhost:8080");
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const currentTime = new Date().toLocaleTimeString("en-US", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          fractionalSecondDigits: 2,
+        });
+
+        // Update anomaly chart if data is present
+        if (data.anomaly !== undefined) {
+          anomalyChart.data.labels.push(currentTime);
+          anomalyChart.data.datasets[0].data.push(parseInt(data.anomaly));
+          anomalyChart.update();
+        }
+
+        // Update input HR chart if data is present
+        if (data.input !== undefined) {
+          inputChart.data.labels.push(currentTime);
+          inputChart.data.datasets[0].data.push(parseInt(data.input));
+          inputChart.update();
+        }
+
+        // Update predicted HR chart if data is present
+        if (data.predicted !== undefined) {
+          predictedChart.data.labels.push(currentTime);
+          data.predicted.forEach((value) => {
+            predictedChart.data.datasets[0].data.push(value);
+          });
+          predictedChart.data.datasets[0].data.push();
+          predictedChart.update();
+        }
+      };
+    </script>
+  </body>
+</html>

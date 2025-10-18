@@ -1,0 +1,20 @@
+{
+  "name": "digital-twin",
+  "version": "1.0.0",
+  "description": "Digital twin node server for fitness tracking from IoT device via simulink",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dgram": "^1.0.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.11.0",
+    "morgan": "^1.10.0",
+    "ws": "^8.18.1"
+  }
+}
